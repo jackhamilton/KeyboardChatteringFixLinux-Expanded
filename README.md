@@ -13,6 +13,16 @@ cd ..
 rm -rf KeyboardChatteringFixLinux-Expanded
 ```
 
+Once you've finished installing, edit the config file at /root/.config/KeyboardChatteringFix/config.
+If you're using a virtual keyboard, put the name in the Keyboard field, and everything else should be fine. 
+Otherwise, set IsVirtual to 'no', and set Keyboard = to the name of your -kbd file in /dev/input/by-id.
+You don't need the path, just the filename. After you've done this, restart the systemd service:
+
+```shell
+sudo systemctl stop chattering_fix.service
+sudo systemctl start chattering_fix.service
+```
+
 Original readme (I've removed the sections this version makes outdated):
 # __Keyboard Chattering Fix for Linux__
 
