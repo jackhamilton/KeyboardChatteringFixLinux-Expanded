@@ -1,3 +1,19 @@
+This is an enhancement to finkrer's fantastic existing solution. The readme below is a mirror of the original project's. My changes are as follows:
+
+1) Added support for virtual keyboards, e.g. KMonad. My testing has revolved mainly around this functionality, but I've tried to keep the original's intact. Please feel free to submit an issue if anything is broken.
+2) Added a configuration file, at /root/.config/KeyboardChatteringFix/config. It's in TOML format, so should be fairly standard. It's at root rather than user level since the application must run at root level.
+3) Added a service installer. Please note the pip3 install requirements.txt line may fail on some operating systems - if it does, and the service breaks, please manually install the contents of requirements.txt. This installer installs the program to /usr/lib/KeyboardChatteringService, creates the config, installs a systemd service to /usr/lib/systemd/system/chattering_fix.service, and starts said service.
+
+Installation:
+```shell
+git clone https://github.com/jackhamilton/KeyboardChatteringFixLinux-Expanded.git
+cd KeyboardChatteringFixLinux-Expanded
+sudo sh setup.sh
+cd ..
+rm -rf KeyboardChatteringFixLinux-Expanded
+```
+
+Original readme (I've removed the sections this version makes outdated):
 # __Keyboard Chattering Fix for Linux__
 
 [![GitHub](https://img.shields.io/github/license/w2sv/KeyboardChatteringFix-Linux?)](LICENSE)
@@ -40,62 +56,3 @@ This also means it works across the system, without depending on X.
 As for the filtering rule, what seems to work well is the time between the last key up event
 and the current key down event. When the key chatters, that time seems to be very low - around 10 ms.
 By filtering such anomalies, we can hopefully remove chatter without impeding actual fast key presses.
-
-## Installation
-
-Download the repository as a zip and extract the file. The dependencies are listed in the requirements.txt. And you can install it with the command below. 
-
-```shell
-sudo pip3 install -r requirements.txt
-```
-
-## Usage
-
-`cd` inside the location of the KeyboardChatteringFix-Linux-master extracted folder and enter the command below to run.
-
-```shell
-sudo python3 -m src
-```
-
-### Customization Options
-
-- -k KEYBOARD, --keyboard KEYBOARD
-  - Name of your chattering keyboard device as listed in /dev/input/by-id. If left unset, will be attempted to be retrieved
-  automatically. The device is captured `by-id`, and therefore in a persistent way.
-
-- -t THRESHOLD, --threshold THRESHOLD
-  - Filter time threshold in milliseconds. Default=30ms. Note: This does not denote the time between key presses, but
-    between a key being
-    released and pressed again, so the number should probably be lower than you might think. For reference, if you
-    press the key really fast this delay is around 50 ms.
-
-- -v {0,1,2}, --verbosity {0,1,2}
-
-## Automation
-
-Starting the script manually every time doesn't sound like the greatest idea, so
-you should probably consider something that does it for you. Modify the `chattering_fix.sh` to `cd` into the absolute path of the downloaded folder and input the keyboard id and the desired threshold. For example:
-```shell
-cd /home/foouser/Downloads/KeyboardChatteringFix-Linux-master/ && sudo python3 -m src -k usb-SINO_WEALTH_USB_KEYBOARD-event-kbd -t 50
-```
-Also, make sure to change the file permission of `chattering_fix.sh` so that it is executable.
-```shell
-chmod +x chattering_fix.sh
-```
-The `chattering_fix.service` file should also be edited. The `ExecStart` should be the absolute path of the `chattering_fix.sh`. For example:
-```shell
-ExecStart=/home/foouser/Downloads/KeyboardChatteringFix-Linux-master/chattering_fix.sh
-```
-Then, copy the `chattering_fix.service` to `/etc/systemd/system/` and enable it with the command below.
-```shell
-systemctl enable --now chattering_fix
-```
-You can check if the systemd unit file is properly working using 
-```shell
-systemctl status chattering_fix.service
-```
-You can also use 
-```shell
-journalctl -xeu chattering_fix.service
-```
-just to make sure that there are no errors.
