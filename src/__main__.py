@@ -1,13 +1,14 @@
 import argparse
 import logging
 import sys
+import configparser
+import os
 from contextlib import contextmanager
 
 import libevdev
 
 from src.filtering import filter_chattering
-from src.keyboard_retrieval import retrieve_keyboard_name, INPUT_DEVICES_PATH, abs_keyboard_path
-
+from src.keyboard_retrieval import retrieve_virtual_keyboard_with_name, abs_keyboard_path, retrieve_keyboard_name
 
 @contextmanager
 def get_device_handle(keyboard_name: str) -> libevdev.Device:
@@ -22,21 +23,26 @@ def get_device_handle(keyboard_name: str) -> libevdev.Device:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-k', '--keyboard', type=str, default=str(),
-                        help=f"Name of your chattering keyboard device as listed in {INPUT_DEVICES_PATH}. "
-                             f"If left unset, will be attempted to be retrieved automatically.")
-    parser.add_argument('-t', '--threshold', type=int, default=30, help="Filter time threshold in milliseconds. "
-                                                                        "Default=30ms.")
-    parser.add_argument('-v', '--verbosity', type=int, default=1, choices=[0, 1, 2])
-    args = parser.parse_args()
+    config = configparser.ConfigParser()
+    configPath = os.getenv("HOME") + '/.config/KeyboardChatteringFix/config'
+    config.read(configPath)
+    configuration = config['CONFIG']
+    keyboardName = configuration['Keyboard']
+    verbosity = configuration['Verbosity']
+    keyboardIsVirtual = config.getboolean('CONFIG', 'IsVirtual')
+    threshhold = config.getint('CONFIG', 'Threshhold')
+    intVerbosity = 0
+    if verbosity == "INFO":
+        intVerbosity = 1
+    elif verbosity == "DEBUG":
+        intVerbosity = 2
 
     logging.basicConfig(
         level={
             0: logging.CRITICAL,
             1: logging.INFO,
             2: logging.DEBUG
-        }[args.verbosity],
+        }[intVerbosity],
         handlers=[
             logging.StreamHandler(
                 sys.stdout
@@ -45,6 +51,20 @@ if __name__ == "__main__":
         format="%(asctime)s - %(message)s",
         datefmt="%H:%M:%S"
     )
+    
+    keyboardPath = ""
+    if keyboardIsVirtual and keyboardName:
+        keyboardPath = retrieve_virtual_keyboard_with_name(keyboardName)
+    elif not keyboardIsVirtual:
+        if keyboardName:
+            keyboardPath = keyboardName
+        else:
+            keyboardPath = retrieve_keyboard_name()
+    else:
+        print("Failed to construct keyboard based on provided configuration. Double check your ~/.config/KeyboardChatteringFix/config.")
+        sys.exit()
+    print("Using keyboard " + keyboardPath + " with threshhold " + str(threshhold))
 
-    with get_device_handle(args.keyboard or retrieve_keyboard_name()) as device:
-        filter_chattering(device, args.threshold)
+    deviceHandle = get_device_handle(keyboardPath)
+    with get_device_handle(keyboardPath) as device:
+        filter_chattering(device, threshhold)

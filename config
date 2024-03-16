@@ -1,0 +1,29 @@
+# TOML-style config for KeyboardChatterFix
+
+# Keyboard:
+# The name of your keyboard. If you're using KMonad or another virtual
+# keyboard, this should be the name of the virtual keyboard it creates.
+# Otherwise, it should be your /dev/input/by-id/ input file. You may
+# also omit this key if IsVirtual is false, and the program will
+# attempt to autodetect it. If you go this route, run the program manually
+# to perform the detection and then enable the service.
+#
+# IsVirtual:
+# If you're using KMonad or a similar program, this will cause the chatter fix
+# to attempt to find a virtual keyboard with the above name instead of using
+# /dev/input/by-id.
+#
+# Threshhold:
+# Chatter blocking threshhold in ms. Repeated keypresses faster than this
+# will be removed.
+#
+# Verbosity:
+# Verbosity for the chatter blocking part of the program. Defaults to CRITICAL,
+# but you can also set to INFO and DEBUG (levels 1 and 2 respectively, with 2
+# being the most verbose setting).
+
+[CONFIG]
+Keyboard = KMonad kbd
+IsVirtual = yes
+Threshhold = 30
+Verbosity = CRITICAL

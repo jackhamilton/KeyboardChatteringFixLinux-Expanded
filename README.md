@@ -1,18 +1,3 @@
-This is an enhancement to finkrer's fantastic existing solution. The readme below is a mirror of the original project's. My changes are as follows:
-
-1) Added support for virtual keyboards, e.g. KMonad. My testing has revolved mainly around this functionality, but I've tried to keep the original's intact. Please feel free to submit an issue if anything is broken.
-2) Added a configuration file, at /root/.config/KeyboardChatteringFix/config. It's in TOML format, so should be fairly standard. It's at root rather than user level since the application must run at root level.
-3) Added a service installer. Please note the pip3 install requirements.txt line may fail on some operating systems - if it does, and the service breaks, please manually install the contents of requirements.txt. This installer installs the program to /usr/lib/KeyboardChatteringService, creates the config, installs a systemd service to /usr/lib/systemd/system/chattering_fix.service, and starts said service.
-
-Installation:
-```shell
-git clone https://github.com/jackhamilton/KeyboardChatteringFixLinux-Expanded.git
-cd KeyboardChatteringFixLinux-Expanded
-sudo sh setup.sh
-cd ..
-rm -rf KeyboardChatteringFixLinux-Expanded
-```
-
 # __Keyboard Chattering Fix for Linux__
 
 [![GitHub](https://img.shields.io/github/license/w2sv/KeyboardChatteringFix-Linux?)](LICENSE)
